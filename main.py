@@ -2,24 +2,36 @@ import discord
 from discord.ext import commands
 from bot_token import token_bot
 import asyncio
+import json
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='>', intents=intents)
 
-# set is running to False again on game end
+
 server_data = {}
+
+try:
+    with open('server_data.json', 'r') as f:
+        server_data = json.load(f)
+except FileNotFoundError:
+    server_data = server_data
+
+
+def save_server_data():
+    with open('server_data.json', 'w') as f:
+        json.dump(server_data, f)
 
 
 @bot.event
 async def on_guild_join(guild):
     server_data[guild.id] = {'IsRunning': False}
     print(guild.id)
+    save_server_data()
 
 
 @bot.event
 async def on_guild_remove(guild):
-    # Remove server-specific data when the bot leaves a server
     del server_data[guild.id]
 
 
@@ -31,6 +43,7 @@ async def id(ctx):
 @bot.command()
 async def start(ctx, nplayers):
     server_id = ctx.guild.id
+    print(server_id)
     IsRunning = server_data.get(server_id, {}).get('IsRunning', False)
 
     if IsRunning:
