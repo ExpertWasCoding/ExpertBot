@@ -41,22 +41,23 @@ async def id(ctx):
 async def start(ctx, nplayers):
     server_id = ctx.guild.id
     IsRunning = server_data.get(server_id, {}).get('IsRunning', False)
-
+    players = []
     if IsRunning:
         await ctx.send("already running lil bro")
         return
     nplayers = int(nplayers)
     if nplayers > 9:
-        await ctx.send(f'number of players {nplayers}, is too large, the max number of players is 9')
+        await ctx.send(f'number of players {nplayers}, is too large'
+                       'the max number of players is 9')
         return
     elif nplayers < 2:
         await ctx.send("not enough players")
         return
     elif nplayers == 2:
-        await ctx.send(f"Game started but the recommended number of players is greater than {nplayers}")
-        IsRunning = True
+        await ctx.send(f"Game started but the recommended number of players is"
+                       f" greater than {nplayers}")
     else:
-        await ctx.send(f'Game started with {nplayers} players, {ctx.author.mention} type ">play" to join.')
+        await ctx.send(f'game started with {nplayers} players')
     server_data[server_id]['IsRunning'] = True
 
     def check(msg, mentioned=None):
