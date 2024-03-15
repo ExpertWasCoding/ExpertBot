@@ -4,6 +4,7 @@ from bot_token import token_bot
 import asyncio
 import pymongo
 
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='>', intents=intents)
@@ -22,6 +23,7 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_guild_remove(guild):
+    collection.delete_one({'server_id': guild.id})
     del server_data[guild.id]
 
 
