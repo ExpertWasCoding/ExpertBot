@@ -2,24 +2,26 @@ import discord
 from discord.ext import commands
 from bot_token import token_bot
 import asyncio
+import pymongo
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='>', intents=intents)
-
-# set is running to False again on game end
+client = pymongo.MongoClient('mongodb://localhost:27017/')
+db = client['server_data']
+collection = db['servers']
 server_data = {}
 
 
 @bot.event
 async def on_guild_join(guild):
     server_data[guild.id] = {'IsRunning': False}
-    print(guild.id)
+    data = {'server_id': guild.id, 'IsRunning': False}
+    collection.insert_one(data)
 
 
 @bot.event
 async def on_guild_remove(guild):
-    # Remove server-specific data when the bot leaves a server
     del server_data[guild.id]
 
 
