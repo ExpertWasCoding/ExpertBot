@@ -13,6 +13,11 @@ db = client['server_data']
 collection = db['servers']
 server_data = {}
 
+for document in collection.find():
+    server_id = document['server_id']
+    is_running = document['IsRunning']
+    server_data[server_id] = {'IsRunning': is_running}
+
 
 @bot.event
 async def on_guild_join(guild):
