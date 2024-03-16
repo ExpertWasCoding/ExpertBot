@@ -72,11 +72,14 @@ async def start(ctx, nplayers):
         try:
             message = await bot.wait_for("message", check=check_message, timeout=60)
             if message.author.mention in players:
-                await ctx.send(f"this nigga {message.author.mention} is already there")
+                await ctx.send(
+                    f"this nigga {message.author.mention}" "is already there"
+                )
             else:
                 players.append(message.author.mention)
                 await ctx.send(
-                    f"{message.author} has joined the game, total players are {players}"
+                    f"{message.author} has joined the game,"
+                    f" total players are {players}"
                 )
         except asyncio.TimeoutError:
             ctx.send("timed out")
