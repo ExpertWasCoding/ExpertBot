@@ -7,28 +7,29 @@ import pymongo
 
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='>', intents=intents)
-client = pymongo.MongoClient('mongodb://localhost:27017/')
-db = client['server_data']
-collection = db['servers']
+bot = commands.Bot(command_prefix=">", intents=intents)
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+db = client["server_data"]
+collection = db["servers"]
 server_data = {}
 
+
 for document in collection.find():
-    server_id = document['server_id']
-    is_running = document['IsRunning']
-    server_data[server_id] = {'IsRunning': is_running}
+    server_id = document["server_id"]
+    is_running = document["IsRunning"]
+    server_data[server_id] = {"IsRunning": is_running}
 
 
 @bot.event
 async def on_guild_join(guild):
-    server_data[guild.id] = {'IsRunning': False}
-    data = {'server_id': guild.id, 'IsRunning': False}
+    server_data[guild.id] = {"IsRunning": False}
+    data = {"server_id": guild.id, "IsRunning": False}
     collection.insert_one(data)
 
 
 @bot.event
 async def on_guild_remove(guild):
-    collection.delete_one({'server_id': guild.id})
+    collection.delete_one({"server_id": guild.id})
     del server_data[guild.id]
 
 
@@ -40,40 +41,57 @@ async def id(ctx):
 @bot.command()
 async def start(ctx, nplayers):
     server_id = ctx.guild.id
-    IsRunning = server_data.get(server_id, {}).get('IsRunning', False)
-    players = []
+    IsRunning = server_data.get(server_id, {}).get("IsRunning", False)
     if IsRunning:
         await ctx.send("already running lil bro")
         return
     nplayers = int(nplayers)
     if nplayers > 9:
-        await ctx.send(f'number of players {nplayers}, is too large'
-                       'the max number of players is 9')
+        await ctx.send(
+            f"number of players {nplayers}, is too large"
+            "the max number of players is 9"
+        )
         return
     elif nplayers < 2:
         await ctx.send("not enough players")
         return
     elif nplayers == 2:
-        await ctx.send(f"Game started but the recommended number of players is"
-                       f" greater than {nplayers}")
+        await ctx.send(
+            f"Game started but the recommended number of players is"
+            f" greater than {nplayers}"
+        )
     else:
-        await ctx.send(f'game started with {nplayers} players')
-    server_data[server_id]['IsRunning'] = True
+        await ctx.send(f"game started with {nplayers} players")
+    players = []
+    server_data[server_id]["IsRunning"] = True
 
-    def check(msg, mentioned=None):
-        if msg.author == ctx.author and msg.content.lower() == '>play':
-            server_data[server_id]['IsRunning'] = True
-    try:
-        await bot.wait_for('message', timeout=60, check=check)
-    except asyncio.TimeoutError:
-        await ctx.send('Timeout. Not enough players.')
-    else:
-        await ctx.send(f'{ctx.author.mention} joined the game!')
+    def check_message(message):
+        return message.guild == ctx.guild and message.content == "play"
+
+    while len(players) < nplayers:
+        try:
+            message = await bot.wait_for("message", check=check_message, timeout=60)
+            if message.author.mention in players:
+                await ctx.send(f"this nigga {message.author.mention} is already there")
+            else:
+                players.append(message.author.mention)
+                await ctx.send(
+                    f"{message.author} has joined the game, total players are {players}"
+                )
+        except asyncio.TimeoutError:
+            ctx.send("timed out")
+            break
 
 
 @bot.command()
-async def userping(ctx, arg):
-    await ctx.send("dwiajo")
+async def userping(ctx):
+    await ctx.send(ctx.author.mention)
+    return
+
+
+@bot.command()
+async def mentioned(ctx, arg):
+    await ctx.send(f"{ctx.author.mention} mentioned {arg}")
 
 
 bot.run(token_bot)
