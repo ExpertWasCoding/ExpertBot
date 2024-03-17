@@ -12,7 +12,10 @@ client = pymongo.MongoClient("mongodb://localhost:27017/")
 db = client["server_data"]
 collection = db["servers"]
 server_data = {}
-
+server_deck = {}
+suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+values = ["2", "3", "4", "5", "6", "7", "8",
+          "9", "10", "Jack", "Queen", "King", "Ace"]
 
 for document in collection.find():
     server_id = document["server_id"]
@@ -82,8 +85,34 @@ async def start(ctx, nplayers):
                     f" total players are {players}"
                 )
         except asyncio.TimeoutError:
-            ctx.send("timed out")
+            await ctx.send("timed out")
             break
+    server_deck[ctx.guild.id] = create_deck()
+
+
+def create_deck():
+    suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
+    values = [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "Jack",
+        "Queen",
+        "King",
+        "Ace",
+    ]
+    deck = []
+    for suit in suits:
+        for value in values:
+            card = f"{value} of {suit}"
+            deck.append(card)
+    return deck
 
 
 @bot.command()
