@@ -3,7 +3,7 @@ from discord.ext import commands
 from bot_token import token_bot
 import asyncio
 import pymongo
-
+import random as rand
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -13,14 +13,19 @@ db = client["server_data"]
 collection = db["servers"]
 server_data = {}
 server_deck = {}
-suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
-values = ["2", "3", "4", "5", "6", "7", "8",
-          "9", "10", "Jack", "Queen", "King", "Ace"]
 
 for document in collection.find():
     server_id = document["server_id"]
     is_running = document["IsRunning"]
     server_data[server_id] = {"IsRunning": is_running}
+
+
+def two_random_numbers():
+    list_of_two_rand_nums = []
+    for i in range(2):
+        two_nums = rand.randint(0, 53)
+        list_of_two_rand_nums.append(two_nums)
+    return list_of_two_rand_nums
 
 
 @bot.event
@@ -88,6 +93,12 @@ async def start(ctx, nplayers):
             await ctx.send("timed out")
             break
     server_deck[ctx.guild.id] = create_deck()
+    players_with_cards = {}
+    for player in players:
+        random_indices = two_random_numbers()
+        cards = [server_deck[ctx.guild.id][index] for index in random_indices]
+        players_with_cards[player] = cards
+    await ctx.send(players_with_cards)
 
 
 def create_deck():
