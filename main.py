@@ -71,6 +71,7 @@ async def start(ctx, nplayers):
     else:
         await ctx.send(f"game started with {nplayers} players")
     players = []
+    player_id = []
     server_data[server_id]["IsRunning"] = True
 
     def check_message(message):
@@ -98,7 +99,15 @@ async def start(ctx, nplayers):
         random_indices = two_random_numbers()
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
         players_with_cards[player] = cards
-    await ctx.send(players_with_cards)
+    for player in players:
+        player_mention = discord.utils.get(
+            ctx.guild.members, display_name=player)
+        if player_mention:
+            await player_mention.send(f"your cards are {players_with_cards[player]}")
+        else:
+            await ctx.send(
+                f"failed {player} not found in {players} or {players_with_cards} or {player_mention}"
+            )
 
 
 def create_deck():
@@ -133,8 +142,25 @@ async def userping(ctx):
 
 
 @bot.command()
+async def dmme(ctx, arg):
+    await ctx.send(f"dm'ed {ctx.author.mention} {arg}")
+    await ctx.author.send(f"{arg}")
+
+
+@bot.command()
 async def mentioned(ctx, arg):
     await ctx.send(f"{ctx.author.mention} mentioned {arg}")
+
+
+@bot.command()
+async def dm_user(ctx, user_mention: discord.Member, *, message: str):
+    # Check if the user has permissions to send DMs
+    if not user_mention.dm_channel:
+        await user_mention.create_dm()
+
+    # Send the message
+    await user_mention.send(message)
+    await ctx.send(f"Message sent to {user_mention.mention}")
 
 
 bot.run(token_bot)
