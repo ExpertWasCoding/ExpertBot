@@ -72,6 +72,7 @@ async def start(ctx, nplayers):
         await ctx.send(f"game started with {nplayers} players")
     players = []
     player_id = []
+    player_with_ids = {}
     server_data[server_id]["IsRunning"] = True
 
     def check_message(message):
@@ -81,15 +82,16 @@ async def start(ctx, nplayers):
         try:
             message = await bot.wait_for("message", check=check_message, timeout=60)
             if message.author.mention in players:
-                await ctx.send(
-                    f"this nigga {message.author.mention}" "is already there"
-                )
+                await ctx.send(f"{message.author.mention}" "is already there")
             else:
                 players.append(message.author.mention)
+                player_id.append(message.author)
+                player_with_ids[message.author.mention] = message.author
                 await ctx.send(
                     f"{message.author} has joined the game,"
                     f" total players are {players}"
                 )
+                await message.author.send("you are playing")
         except asyncio.TimeoutError:
             await ctx.send("timed out")
             break
@@ -100,14 +102,9 @@ async def start(ctx, nplayers):
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
         players_with_cards[player] = cards
     for player in players:
-        player_mention = discord.utils.get(
-            ctx.guild.members, display_name=player)
-        if player_mention:
-            await player_mention.send(f"your cards are {players_with_cards[player]}")
-        else:
-            await ctx.send(
-                f"failed {player} not found in {players} or {players_with_cards} or {player_mention}"
-            )
+        await player_with_ids[player].send(
+            f"your cards are {players_with_cards[player]}"
+        )
 
 
 def create_deck():
