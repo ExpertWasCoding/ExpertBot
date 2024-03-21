@@ -20,12 +20,12 @@ for document in collection.find():
     server_data[server_id] = {"IsRunning": is_running}
 
 
-def two_random_numbers():
-    list_of_two_rand_nums = []
-    for i in range(2):
-        two_nums = rand.randint(0, 53)
-        list_of_two_rand_nums.append(two_nums)
-    return list_of_two_rand_nums
+def random_numbers(n, _range=53):
+    list_of_rand_nums = []
+    for i in range(n):
+        nums = rand.randint(0, _range)
+        list_of_rand_nums.append(nums)
+    return list_of_rand_nums
 
 
 @bot.event
@@ -48,7 +48,7 @@ async def id(ctx):
 
 @bot.command()
 async def start(ctx, nplayers=None):
-    if nplayers == None:
+    if nplayers is None:
         await ctx.send('please specify the number of players example -> ">start 2"')
         return
 
@@ -102,7 +102,7 @@ async def start(ctx, nplayers=None):
     server_deck[ctx.guild.id] = create_deck()
     players_with_cards = {}
     for player in players:
-        random_indices = two_random_numbers()
+        random_indices = random_numbers(2)
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
         players_with_cards[player] = cards
     for player in players:
