@@ -47,7 +47,11 @@ async def id(ctx):
 
 
 @bot.command()
-async def start(ctx, nplayers):
+async def start(ctx, nplayers=None):
+    if nplayers == None:
+        await ctx.send('please specify the number of players example -> ">start 2"')
+        return
+
     server_id = ctx.guild.id
     IsRunning = server_data.get(server_id, {}).get("IsRunning", False)
     if IsRunning:
