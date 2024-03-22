@@ -5,6 +5,8 @@ import asyncio
 import pymongo
 import random as rand
 
+# max players exceeded warning on "play"
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
@@ -95,7 +97,11 @@ async def start(ctx, nplayers=None):
                     f"{message.author} has joined the game,"
                     f" total players are {players}"
                 )
-                await message.author.send("you are playing")
+                try:
+                    await message.author.send("you are playing")
+                except discord.errors.Forbidden:
+                    await ctx.send("DM's not open")
+                    break
         except asyncio.TimeoutError:
             await ctx.send("timed out")
             break
@@ -109,6 +115,7 @@ async def start(ctx, nplayers=None):
         await player_with_ids[player].send(
             f"your cards are {players_with_cards[player]}"
         )
+
     for cards in players_with_cards.values():
         for card in cards:
             server_deck[ctx.guild.id].remove(card)
