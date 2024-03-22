@@ -109,6 +109,10 @@ async def start(ctx, nplayers=None):
         await player_with_ids[player].send(
             f"your cards are {players_with_cards[player]}"
         )
+    for cards in players_with_cards.values():
+        for card in cards:
+            server_deck[ctx.guild.id].remove(card)
+    await ctx.send(len(server_deck[ctx.guild.id]))
 
 
 def create_deck():
