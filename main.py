@@ -4,7 +4,7 @@ from bot_token import token_bot
 import asyncio
 import pymongo
 import random as rand
-
+# rand comment for future
 # max players exceeded warning on "play"
 
 intents = discord.Intents.default()
