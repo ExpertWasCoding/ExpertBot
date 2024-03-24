@@ -107,8 +107,10 @@ async def start(ctx, nplayers=None):
 
     for cards in players_with_cards.values():
         for card in cards:
-            server_deck[ctx.guild.id].remove(card)
-
+            if card in server_deck[ctx.guild.id]:
+                server_deck[ctx.guild.id].remove(card)
+            else:
+                ctx.send(f"{card} not found")
         # await ctx.send(len(server_deck[ctx.guild.id]))
 
 
