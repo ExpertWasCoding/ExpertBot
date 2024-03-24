@@ -108,7 +108,8 @@ async def start(ctx, nplayers=None):
     for cards in players_with_cards.values():
         for card in cards:
             server_deck[ctx.guild.id].remove(card)
-    # await ctx.send(len(server_deck[ctx.guild.id]))
+
+        # await ctx.send(len(server_deck[ctx.guild.id]))
 
 
 @bot.command()
