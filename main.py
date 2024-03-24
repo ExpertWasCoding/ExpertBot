@@ -111,7 +111,38 @@ async def start(ctx, nplayers=None):
                 server_deck[ctx.guild.id].remove(card)
             else:
                 ctx.send(f"{card} not found")
-        # await ctx.send(len(server_deck[ctx.guild.id]))
+    await start_game_loop(
+        ctx, players, player_with_ids, players_with_cards, players_with_money
+    )
+    # await ctx.send(len(server_deck[ctx.guild.id]))
+
+
+async def start_game_loop(
+    ctx, players, player_with_ids, players_with_cards, players_with_money
+):
+    current_player_index = 0
+    game_over = False
+
+    while not game_over:
+        current_player = players[current_player_index]
+
+        # Notify the current player that it's their turn
+        await ctx.send(f"{player_with_ids[current_player]}It's your turn.")
+
+        # Show the player their cards and current money
+        await player_with_ids[current_player].send(
+            f"Your cards are {players_with_cards[current_player]} and your money is {players_with_money[current_player]}"
+        )
+
+        # Wait for the player's action (like fold, call, raise, etc.)
+        # action = await get_player_action(ctx, current_player)
+
+        # Process the player's action
+        # await process_player_action(ctx, action, current_player, players, player_with_ids, players_with_cards, players_with_money)
+
+        # Check if the game is over or move to the next player's turn
+        current_player_index = (current_player_index + 1) % len(players)
+        # game_over = check_game_over_condition()
 
 
 @bot.command()
