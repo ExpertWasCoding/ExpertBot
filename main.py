@@ -1,4 +1,3 @@
-import random as rand
 import pymongo
 import asyncio
 from bot_token import token_bot
@@ -95,13 +94,15 @@ async def start(ctx, nplayers=None):
             break
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
+    players_with_money = {}
     for player in players:
         random_indices = utils.random_numbers(2)
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
         players_with_cards[player] = cards
+        players_with_money[player] = 1000
     for player in players:
         await player_with_ids[player].send(
-            f"your cards are {players_with_cards[player]}"
+            f"your cards are {players_with_cards[player]} and money is {players_with_money[player]}"
         )
 
     for cards in players_with_cards.values():
