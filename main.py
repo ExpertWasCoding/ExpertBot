@@ -110,7 +110,7 @@ async def start(ctx, nplayers=None):
             if card in server_deck[ctx.guild.id]:
                 server_deck[ctx.guild.id].remove(card)
             else:
-                ctx.send(f"{card} not found")
+                await ctx.send(f"{card} not found")
     await start_game_loop(
         ctx, players, player_with_ids, players_with_cards, players_with_money
     )
@@ -127,7 +127,7 @@ async def start_game_loop(
         current_player = players[current_player_index]
 
         # Notify the current player that it's their turn
-        await ctx.send(f"{player_with_ids[current_player]}It's your turn.")
+        await ctx.send(f"{player_with_ids[current_player]} It's your turn.")
 
         # Show the player their cards and current money
         await player_with_ids[current_player].send(
@@ -135,7 +135,8 @@ async def start_game_loop(
         )
 
         # Wait for the player's action (like fold, call, raise, etc.)
-        # action = await get_player_action(ctx, current_player)
+        action = await get_player_action(ctx, current_player)
+        await ctx.send(f"{action}")
 
         # Process the player's action
         # await process_player_action(ctx, action, current_player, players, player_with_ids, players_with_cards, players_with_money)
@@ -143,6 +144,20 @@ async def start_game_loop(
         # Check if the game is over or move to the next player's turn
         current_player_index = (current_player_index + 1) % len(players)
         # game_over = check_game_over_condition()
+
+
+async def get_player_action(ctx, current_player):
+    def check(message):
+        return message.author.mention == current_player
+
+    try:
+        message = await bot.wait_for("message", check=check, timeout=60)
+        return (
+            message.content
+        )  # Return the content of the message as the player's action
+    except asyncio.TimeoutError:
+        await ctx.send(f"{current_player.mention} took too long to make a move.")
+        return None  # Return None if the player times out
 
 
 @bot.command()
@@ -155,6 +170,11 @@ async def userping(ctx):
 async def dmme(ctx, arg):
     await ctx.send(f"dm'ed {ctx.author.mention} {arg}")
     await ctx.author.send(f"{arg}")
+
+
+@bot.command()
+async def debug(ctx):
+    await ctx.send(f"{ctx.author}")
 
 
 @bot.command()
