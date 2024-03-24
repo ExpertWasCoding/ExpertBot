@@ -3,10 +3,11 @@ from discord.ext import commands
 from bot_token import token_bot
 import asyncio
 import pymongo
-import random as rand
+import utils
+
 # rand comment for future
 # max players exceeded warning on "play"
-
+# handle the card not in index exception
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
@@ -20,14 +21,6 @@ for document in collection.find():
     server_id = document["server_id"]
     is_running = document["IsRunning"]
     server_data[server_id] = {"IsRunning": is_running}
-
-
-def random_numbers(n, _range=53):
-    list_of_rand_nums = []
-    for i in range(n):
-        nums = rand.randint(0, _range)
-        list_of_rand_nums.append(nums)
-    return list_of_rand_nums
 
 
 @bot.event
@@ -105,10 +98,10 @@ async def start(ctx, nplayers=None):
         except asyncio.TimeoutError:
             await ctx.send("timed out")
             break
-    server_deck[ctx.guild.id] = create_deck()
+    server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
     for player in players:
-        random_indices = random_numbers(2)
+        random_indices = utils.random_numbers(2)
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
         players_with_cards[player] = cards
     for player in players:
@@ -120,31 +113,6 @@ async def start(ctx, nplayers=None):
         for card in cards:
             server_deck[ctx.guild.id].remove(card)
     await ctx.send(len(server_deck[ctx.guild.id]))
-
-
-def create_deck():
-    suits = ["Hearts", "Diamonds", "Clubs", "Spades"]
-    values = [
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "Jack",
-        "Queen",
-        "King",
-        "Ace",
-    ]
-    deck = []
-    for suit in suits:
-        for value in values:
-            card = f"{value} of {suit}"
-            deck.append(card)
-    return deck
 
 
 @bot.command()
