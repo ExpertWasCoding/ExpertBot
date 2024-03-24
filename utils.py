@@ -32,3 +32,24 @@ def random_numbers(n, _range=53):
         nums = rand.randint(0, _range)
         list_of_rand_nums.append(nums)
     return list_of_rand_nums
+
+
+async def check_player_count(ctx, nplayers):
+    if nplayers is None:
+        await ctx.send('Please specify the number of players. Example: ">start 2"')
+        return False
+
+    nplayers = int(nplayers)
+    if nplayers > 9:
+        await ctx.send(
+            f"Number of players {nplayers} is too large. The maximum number of players is 9."
+        )
+        return False
+    elif nplayers < 2:
+        await ctx.send("Not enough players. The minimum number of players is 2.")
+        return False
+    elif nplayers == 2:
+        await ctx.send(
+            f"Game started but the recommended number of players is greater than {nplayers}."
+        )
+    return True

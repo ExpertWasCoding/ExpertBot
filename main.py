@@ -45,27 +45,6 @@ async def id(ctx):
     await ctx.send(ctx.guild.id)
 
 
-async def check_player_count(ctx, nplayers):
-    if nplayers is None:
-        await ctx.send('Please specify the number of players. Example: ">start 2"')
-        return False
-
-    nplayers = int(nplayers)
-    if nplayers > 9:
-        await ctx.send(
-            f"Number of players {nplayers} is too large. The maximum number of players is 9."
-        )
-        return False
-    elif nplayers < 2:
-        await ctx.send("Not enough players. The minimum number of players is 2.")
-        return False
-    elif nplayers == 2:
-        await ctx.send(
-            f"Game started but the recommended number of players is greater than {nplayers}."
-        )
-    return True
-
-
 @bot.command()
 async def start(ctx, nplayers=None):
     if nplayers is None:
@@ -80,7 +59,7 @@ async def start(ctx, nplayers=None):
         return
 
     nplayers = int(nplayers)
-    if await check_player_count(ctx, nplayers):
+    if await utils.check_player_count(ctx, nplayers):
         await ctx.send("starting")
     else:
         return
