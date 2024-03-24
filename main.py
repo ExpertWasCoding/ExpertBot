@@ -91,6 +91,7 @@ async def start(ctx, nplayers=None):
                     break
         except asyncio.TimeoutError:
             await ctx.send("timed out")
+            server_data[server_id]["IsRunning"] = True
             break
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
@@ -139,7 +140,7 @@ async def start_game_loop(
         await ctx.send(f"{action}")
 
         # Process the player's action
-        # await process_player_action(ctx, action, current_player, players, player_with_ids, players_with_cards, players_with_money)
+        # await process_player_action()
 
         # Check if the game is over or move to the next player's turn
         current_player_index = (current_player_index + 1) % len(players)
@@ -152,12 +153,21 @@ async def get_player_action(ctx, current_player):
 
     try:
         message = await bot.wait_for("message", check=check, timeout=60)
-        return (
-            message.content
-        )  # Return the content of the message as the player's action
+        message = message.content
+        splitted_message = message.split(" ")
+        if splitted_message[0] == "fold":
+            return "fold"
+        elif splitted_message[0] == "call":
+            try:
+                await ctx.send(f"called for {int(splitted_message[1])}")
+            except ValueError:
+                await ctx.send(f"{current_player.mention} is not a number")
+        elif splitted_message[0] == "raise":
+            return "raise"
+        # Return the content of the message as the player's action
     except asyncio.TimeoutError:
         await ctx.send(f"{current_player.mention} took too long to make a move.")
-        return None  # Return None if the player times out
+        return  # Return None if the player times out
 
 
 @bot.command()
