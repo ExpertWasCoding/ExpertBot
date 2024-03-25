@@ -96,6 +96,7 @@ async def start(ctx, nplayers=None):
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
     players_with_money = {}
+    table = {}
     for player in players:
         random_indices = utils.random_numbers(2)
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
@@ -138,7 +139,7 @@ async def start_game_loop(
         # Wait for the player's action (like fold, call, raise, etc.)
         action = await get_player_action(ctx, current_player)
         await ctx.send(f"{action}")
-        await process_player_action(ctx, action, money, current_player)
+        await process_player_action(ctx, action, current_player, players_with_money)
 
         # Process the player's action
         # await process_player_action()
@@ -183,8 +184,15 @@ async def get_player_action(ctx, current_player):
         return
 
 
-async def process_player_action(ctx, action, money, current_player):
-    pass
+async def process_player_action(ctx, action, current_player, player_with_money):
+    if isinstance(action, list):
+        if action[0] == "call":
+            player_with_money[current_player] -= int(action[1])
+
+    elif isinstance(action, str):
+
+    else:
+        ctx.send("Some random error occured")
 
 
 @bot.command()
