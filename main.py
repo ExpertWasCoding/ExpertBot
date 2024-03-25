@@ -138,6 +138,7 @@ async def start_game_loop(
         # Wait for the player's action (like fold, call, raise, etc.)
         action = await get_player_action(ctx, current_player)
         await ctx.send(f"{action}")
+        await process_player_action(ctx, action, money, current_player)
 
         # Process the player's action
         # await process_player_action()
@@ -156,18 +157,30 @@ async def get_player_action(ctx, current_player):
         message = message.content
         splitted_message = message.split(" ")
         if splitted_message[0] == "fold":
+            await ctx.send("player folded")
             return "fold"
         elif splitted_message[0] == "call":
             try:
                 await ctx.send(f"called for {int(splitted_message[1])}")
+                return [splitted_message[0], splitted_message[1]]
             except ValueError:
-                await ctx.send(f"{current_player.mention} is not a number")
+                await ctx.send(f"{current_player.mention} is not a number, pls try again")
+                await get_player_action(ctx, current_player)
         elif splitted_message[0] == "raise":
-            return "raise"
-        # Return the content of the message as the player's action
+            try:
+                await ctx.send(f"raised for {int(splitted_message[1])}")
+                return [splitted_message[0], splitted_message[1]]
+            except ValueError:
+                await ctx.send(f"{current_player.mention} is not a number, pls try again")
+                await get_player_action(ctx, current_player)
+
     except asyncio.TimeoutError:
         await ctx.send(f"{current_player.mention} took too long to make a move.")
-        return  # Return None if the player times out
+        return
+
+
+async def process_player_action(ctx, action, money, current_player):
+    if
 
 
 @bot.command()
