@@ -10,7 +10,7 @@ import utils
 # max players exceeded warning on "play"
 # index range error handle
 # add the 12-4 thingy
-
+# should have used hash tables fuck
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
@@ -144,7 +144,6 @@ async def start_game_loop(
             ctx, action, current_player, players_with_money, table
         )
 
-
         # Check if the game is over or move to the next player's turn
         current_player_index = (current_player_index + 1) % len(players)
         # game_over = check_game_over_condition()
@@ -197,6 +196,8 @@ async def process_player_action(ctx, action, current_player, player_with_money, 
             if player_with_money[current_player] >= int(action[1]):
                 player_with_money[current_player] -= int(action[1])
                 table["money"] += int(action[1])
+            else:
+                await ctx.send("Not enough money")
     elif isinstance(action, str):
         if action == "fold":
             await ctx.send("player folded successfully")
@@ -238,3 +239,68 @@ async def dm_user(ctx, user_mention: discord.Member, *, message: str):
 
 
 bot.run(token_bot)
+#
+# from collections import Counter
+#
+#
+# # Function to check for a straight
+# def has_straight(hand_values):
+#     return max(hand_values) - min(hand_values) == 4 and len(set(hand_values)) == 5
+#
+#
+# # Function to check for a flush
+# def has_flush(hand_suits):
+#     return len(set(hand_suits)) == 1
+#
+#
+# # Function to check the hand and determine the best possible hand
+# def check_hand(cards):
+#     values = {
+#         "2": 2,
+#         "3": 3,
+#         "4": 4,
+#         "5": 5,
+#         "6": 6,
+#         "7": 7,
+#         "8": 8,
+#         "9": 9,
+#         "T": 10,
+#         "J": 11,
+#         "Q": 12,
+#         "K": 13,
+#         "A": 14,
+#     }
+#     suits = [card[1] for card in cards]
+#     hand_values = [values[card[0]] for card in cards]
+#     hand_values.sort()
+#
+#     # Check for straight flush, straight, and flush
+#     if has_flush(suits) and has_straight(hand_values):
+#         return "Straight Flush"
+#     elif has_flush(suits):
+#         return "Flush"
+#     elif has_straight(hand_values):
+#         return "Straight"
+#
+#     # Check for four of a kind
+#     if 4 in Counter(hand_values).values():
+#         return "Four of a Kind"
+#
+#     # Check for full house
+#     if set(Counter(hand_values).values()) == {2, 3}:
+#         return "Full House"
+#
+#     # Check for three of a kind
+#     if 3 in Counter(hand_values).values():
+#         return "Three of a Kind"
+#
+#     # Check for two pairs
+#     if list(Counter(hand_values).values()).count(2) == 2:
+#         return "Two Pair"
+#
+#     # Check for one pair
+#     if 2 in Counter(hand_values).values():
+#         return "One Pair"
+#
+#     # Otherwise, the best hand is high card
+#     return "High Card"
