@@ -96,7 +96,7 @@ async def start(ctx, nplayers=None):
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
     players_with_money = {}
-    table = {}
+    table = {"cards": [], "money": 0}
     for player in players:
         random_indices = utils.random_numbers(2)
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
@@ -111,16 +111,17 @@ async def start(ctx, nplayers=None):
         for card in cards:
             if card in server_deck[ctx.guild.id]:
                 server_deck[ctx.guild.id].remove(card)
+                table["cards"].append(card)
             else:
                 await ctx.send(f"{card} not found")
     await start_game_loop(
-        ctx, players, player_with_ids, players_with_cards, players_with_money
+        ctx, players, player_with_ids, players_with_cards, players_with_money, table
     )
     # await ctx.send(len(server_deck[ctx.guild.id]))
 
 
 async def start_game_loop(
-    ctx, players, player_with_ids, players_with_cards, players_with_money
+    ctx, players, player_with_ids, players_with_cards, players_with_money, table
 ):
     current_player_index = 0
     game_over = False
@@ -139,10 +140,10 @@ async def start_game_loop(
         # Wait for the player's action (like fold, call, raise, etc.)
         action = await get_player_action(ctx, current_player)
         await ctx.send(f"{action}")
-        await process_player_action(ctx, action, current_player, players_with_money)
+        await process_player_action(
+            ctx, action, current_player, players_with_money, table
+        )
 
-        # Process the player's action
-        # await process_player_action()
 
         # Check if the game is over or move to the next player's turn
         current_player_index = (current_player_index + 1) % len(players)
@@ -184,15 +185,23 @@ async def get_player_action(ctx, current_player):
         return
 
 
-async def process_player_action(ctx, action, current_player, player_with_money):
+async def process_player_action(ctx, action, current_player, player_with_money, table):
     if isinstance(action, list):
         if action[0] == "call":
-            player_with_money[current_player] -= int(action[1])
-
+            if player_with_money[current_player] >= int(action[1]):
+                player_with_money[current_player] -= int(action[1])
+                table["money"] += int(action[1])
+            else:
+                await ctx.send("Not enough money")
+        elif action[0] == "raise":
+            if player_with_money[current_player] >= int(action[1]):
+                player_with_money[current_player] -= int(action[1])
+                table["money"] += int(action[1])
     elif isinstance(action, str):
-
+        if action == "fold":
+            await ctx.send("player folded successfully")
     else:
-        ctx.send("Some random error occured")
+        await ctx.send("Some random error occured")
 
 
 @bot.command()
