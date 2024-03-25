@@ -6,10 +6,10 @@ import discord
 import utils
 
 
-# rand comment for future
 # max players exceeded warning on "play"
 # index range error handle
 # add the 12-4 thingy
+# add a stop command
 # should have used hash tables fuck
 intents = discord.Intents.default()
 intents.message_content = True
@@ -239,6 +239,8 @@ async def dm_user(ctx, user_mention: discord.Member, *, message: str):
 
 
 bot.run(token_bot)
+
+# Code below is written by chatgpt, do not pay attention it is for reference during card permutation
 #
 # from collections import Counter
 #
