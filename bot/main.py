@@ -11,6 +11,7 @@ import utils
 # add the 12-4 thingy
 # add a stop command
 # should have used hash tables fuck
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
@@ -236,7 +237,9 @@ async def dm_user(ctx, user_mention: discord.Member, *, message: str):
     # Send the message
     await user_mention.send(message)
     await ctx.send(f"Message sent to {user_mention.mention}")
-
+@bot.command()
+async def stop_game(ctx):
+#logic to stop game
 
 bot.run(token_bot)
 
