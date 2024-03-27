@@ -97,10 +97,12 @@ async def start(ctx, nplayers=None):
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
     players_with_money = {}
+    player_with_status = {}
     table = {"cards": [], "money": 0}
     for player in players:
         random_indices = utils.random_numbers(2)
         cards = [server_deck[ctx.guild.id][index] for index in random_indices]
+        player_with_status[player] = False
         players_with_cards[player] = cards
         players_with_money[player] = 1000
     for player in players:
@@ -116,13 +118,25 @@ async def start(ctx, nplayers=None):
             else:
                 await ctx.send(f"{card} not found")
     await start_game_loop(
-        ctx, players, player_with_ids, players_with_cards, players_with_money, table
+        ctx,
+        players,
+        player_with_ids,
+        players_with_cards,
+        players_with_money,
+        table,
+        player_with_status,
     )
     # await ctx.send(len(server_deck[ctx.guild.id]))
 
 
 async def start_game_loop(
-    ctx, players, player_with_ids, players_with_cards, players_with_money, table
+    ctx,
+    players,
+    player_with_ids,
+    players_with_cards,
+    players_with_money,
+    table,
+    player_with_status,
 ):
     current_player_index = 0
     game_over = False
@@ -142,8 +156,15 @@ async def start_game_loop(
         action = await get_player_action(ctx, current_player)
         await ctx.send(f"{action}")
         await process_player_action(
-            ctx, action, current_player, players_with_money, table
+            ctx, action, current_player, players_with_money, table, player_with_status
         )
+        all_players_ready = all(
+            player_with_status[player] for player in players)
+        if all_players_ready:
+            for player in players:
+                await ctx.send(f"card of {player} {players_with_cards[player]}")
+            break
+            # add logic to check if all player_with_status[player] == True
 
         # Check if the game is over or move to the next player's turn
         current_player_index = (current_player_index + 1) % len(players)
@@ -185,12 +206,16 @@ async def get_player_action(ctx, current_player):
         return
 
 
-async def process_player_action(ctx, action, current_player, player_with_money, table):
+async def process_player_action(
+    ctx, action, current_player, player_with_money, table, player_with_status
+):
+    player_with_status[current_player] = False
     if isinstance(action, list):
         if action[0] == "call":
             if player_with_money[current_player] >= int(action[1]):
                 player_with_money[current_player] -= int(action[1])
                 table["money"] += int(action[1])
+                player_with_status[current_player] = True
             else:
                 await ctx.send("Not enough money")
         elif action[0] == "raise":
@@ -237,9 +262,14 @@ async def dm_user(ctx, user_mention: discord.Member, *, message: str):
     # Send the message
     await user_mention.send(message)
     await ctx.send(f"Message sent to {user_mention.mention}")
+
+
 @bot.command()
 async def stop_game(ctx):
-#logic to stop game
+    pass
+
+
+# logic to stop game
 
 bot.run(token_bot)
 
