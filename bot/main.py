@@ -140,8 +140,14 @@ async def start_game_loop(
 ):
     current_player_index = 0
     game_over = False
-
+    turn_number = 0
+    # continue here
     while not game_over:
+        if turn_number == 1:
+            random_two = utils.random_numbers(2, 53 - (len(players) * 2))
+            cards_to_add = [server_deck[ctx.guild.id][index] for index in random_two]
+            del server_deck[ctx.guild.id][index]
+
         current_player = players[current_player_index]
 
         # Notify the current player that it's their turn
@@ -166,7 +172,7 @@ async def start_game_loop(
                     player,
                     players_with_money,
                     player_with_status,
-                    player_with_cards,
+                    players_with_cards,
                 )
             break
             # add logic to check if all player_with_status[player] == True
@@ -220,21 +226,23 @@ async def game_over_check(
 async def process_player_action(
     ctx, action, current_player, player_with_money, table, player_with_status
 ):
-    player_with_status[current_player] = False
-    if isinstance(action, list):
-        if action[0] == "call":
-            if player_with_money[current_player] >= int(action[1]):
-                player_with_money[current_player] -= int(action[1])
-                table["money"] += int(action[1])
-                player_with_status[current_player] = True
-            else:
-                await ctx.send("Not enough money")
-        elif action[0] == "raise":
-            if player_with_money[current_player] >= int(action[1]):
-                player_with_money[current_player] -= int(action[1])
-                table["money"] += int(action[1])
-            else:
-                await ctx.send("Not enough money")
+    if player_with_status[current_player] == False:
+        if isinstance(action, list):
+            if action[0] == "call":
+                if player_with_money[current_player] >= int(action[1]):
+                    player_with_money[current_player] -= int(action[1])
+                    table["money"] += int(action[1])
+                    player_with_status[current_player] = True
+                else:
+                    await ctx.send("Not enough money")
+            elif action[0] == "raise":
+                if player_with_money[current_player] >= int(action[1]):
+                    player_with_money[current_player] -= int(action[1])
+                    table["money"] += int(action[1])
+                else:
+                    await ctx.send("Not enough money")
+    elif player_with_status[current_player]:
+        await ctx.send(f"{current_player} is folded")
     elif isinstance(action, str):
         if action == "fold":
             await ctx.send("player folded successfully")
