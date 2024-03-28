@@ -158,11 +158,16 @@ async def start_game_loop(
         await process_player_action(
             ctx, action, current_player, players_with_money, table, player_with_status
         )
-        all_players_ready = all(
-            player_with_status[player] for player in players)
+        all_players_ready = all(player_with_status[player] for player in players)
         if all_players_ready:
             for player in players:
-                await ctx.send(f"card of {player} {players_with_cards[player]}")
+                await game_over_check(
+                    ctx,
+                    player,
+                    players_with_money,
+                    player_with_status,
+                    player_with_cards,
+                )
             break
             # add logic to check if all player_with_status[player] == True
 
@@ -204,6 +209,12 @@ async def get_player_action(ctx, current_player):
     except asyncio.TimeoutError:
         await ctx.send(f"{current_player.mention} took too long to make a move.")
         return
+
+
+async def game_over_check(
+    ctx, player, players_with_money, player_with_status, player_with_cards
+):
+    pass
 
 
 async def process_player_action(
