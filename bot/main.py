@@ -101,7 +101,10 @@ async def start(ctx, nplayers=None):
     table = {"cards": [], "money": 0}
     for player in players:
         random_indices = utils.random_numbers(2)
-        cards = [server_deck[ctx.guild.id][index] for index in random_indices]
+        cards = []
+        for index in random_indices:
+            cards.append(server_deck[ctx.guild.id][index])
+            del server_deck[ctx.guild.id][index]
         player_with_status[player] = False
         players_with_cards[player] = cards
         players_with_money[player] = 1000
@@ -117,6 +120,7 @@ async def start(ctx, nplayers=None):
                 table["cards"].append(card)
             else:
                 await ctx.send(f"{card} not found")
+    table["cards_on_table"] = []
     await start_game_loop(
         ctx,
         players,
@@ -143,10 +147,13 @@ async def start_game_loop(
     turn_number = 0
     # continue here
     while not game_over:
-        if turn_number == 1:
+        if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
-            cards_to_add = [server_deck[ctx.guild.id][index] for index in random_two]
-            del server_deck[ctx.guild.id][index]
+            for index in random_two:
+                table["cards_on_table"].append(
+                    server_deck[ctx.guild.id][index])
+                del server_deck[ctx.guild.id][index]
+            await ctx.send(f"{table['cards_on_table']} are now on table")
 
         current_player = players[current_player_index]
 
@@ -164,9 +171,11 @@ async def start_game_loop(
         await process_player_action(
             ctx, action, current_player, players_with_money, table, player_with_status
         )
-        all_players_ready = all(player_with_status[player] for player in players)
+        all_players_ready = all(
+            player_with_status[player] for player in players)
         if all_players_ready:
             for player in players:
+                await ctx.send("ending the game")
                 await game_over_check(
                     ctx,
                     player,
@@ -178,6 +187,7 @@ async def start_game_loop(
             # add logic to check if all player_with_status[player] == True
 
         # Check if the game is over or move to the next player's turn
+        turn_number += 1
         current_player_index = (current_player_index + 1) % len(players)
         # game_over = check_game_over_condition()
 
