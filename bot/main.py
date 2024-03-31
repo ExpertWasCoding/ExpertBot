@@ -12,6 +12,7 @@ import utils
 # add a stop command
 # should have used hash tables fuck
 # can't commit today cuz of high fever
+# ^^
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
 client = pymongo.MongoClient("mongodb://localhost:27017/")
