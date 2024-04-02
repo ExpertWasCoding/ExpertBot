@@ -5,14 +5,12 @@ from discord.ext import commands
 import discord
 import utils
 
-# adding a debugger decorator??
+# on work again
 # max players exceeded warning on "play"
 # index range error handle
-# add the 12-4 thingy
 # add a stop command
 # should have used hash tables fuck
-# can't commit today cuz of high fever
-# ^^
+intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
 client = pymongo.MongoClient("mongodb://localhost:27017/")
