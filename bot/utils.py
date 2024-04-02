@@ -53,3 +53,13 @@ async def check_player_count(ctx, nplayers):
             f"Game started but the recommended number of players is greater than {nplayers}."
         )
     return True
+
+
+def debugger(func):
+    def debugger_func(*args, **kwargs):
+        print("starting debugger")
+        print(f"running {debugger_func.__name__} with args {args}, {kwargs}")
+        print("function ended")
+        return func(*args, **kwargs)
+
+    return debugger_func
