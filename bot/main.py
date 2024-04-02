@@ -5,7 +5,7 @@ from discord.ext import commands
 import discord
 import utils
 
-
+# adding a debugger decorator??
 # max players exceeded warning on "play"
 # index range error handle
 # add the 12-4 thingy
