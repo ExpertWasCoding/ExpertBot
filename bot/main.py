@@ -5,6 +5,7 @@ from discord.ext import commands
 import discord
 import utils
 
+# give points to won player, refresh the won condition to the player with 0 money
 # on work again
 # max players exceeded warning on "play"
 # index range error handle
@@ -95,6 +96,7 @@ async def start(ctx, nplayers=None):
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
     players_with_money = {}
+    players_with_points = {}
     player_with_status = {}
     table = {"cards": [], "money": 0}
     for player in players:
@@ -105,6 +107,7 @@ async def start(ctx, nplayers=None):
             del server_deck[ctx.guild.id][index]
         player_with_status[player] = False
         players_with_cards[player] = cards
+        players_with_points[player] = 0
         players_with_money[player] = 1000
     for player in players:
         await player_with_ids[player].send(
@@ -127,6 +130,7 @@ async def start(ctx, nplayers=None):
         players_with_money,
         table,
         player_with_status,
+        players_with_points,
     )
     # await ctx.send(len(server_deck[ctx.guild.id]))
 
@@ -139,6 +143,7 @@ async def start_game_loop(
     players_with_money,
     table,
     player_with_status,
+    players_with_points,
 ):
     current_player_index = 0
     game_over = False
@@ -147,7 +152,8 @@ async def start_game_loop(
         if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
             for index in random_two:
-                table["cards_on_table"].append(server_deck[ctx.guild.id][index])
+                table["cards_on_table"].append(
+                    server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
 
@@ -158,7 +164,8 @@ async def start_game_loop(
 
         # Show the player their cards and current money
         await player_with_ids[current_player].send(
-            f"Your cards are {players_with_cards[current_player]} and your money is {players_with_money[current_player]}"
+            f"Your cards are {players_with_cards[current_player]} "
+            f"and your money is {players_with_money[current_player]}"
         )
 
         # Wait for the player's action (like fold, call, raise, etc.)
@@ -167,7 +174,8 @@ async def start_game_loop(
         await process_player_action(
             ctx, action, current_player, players_with_money, table, player_with_status
         )
-        all_players_ready = all(player_with_status[player] for player in players)
+        all_players_ready = all(
+            player_with_status[player] for player in players)
         if all_players_ready:
             for player in players:
                 await ctx.send("ending the game")
@@ -178,9 +186,11 @@ async def start_game_loop(
                     player_with_status,
                     players_with_cards,
                     table,
+                    players_with_points,
                 )
+            await ctx.send(f"final result {players_with_points}")
             break
-            # add logic to check if all player_with_status[player] == True
+        # make this correct
 
         # Check if the game is over or move to the next player's turn
         turn_number += 1
@@ -224,7 +234,13 @@ async def get_player_action(ctx, current_player):
 
 
 async def game_over_check(
-    ctx, player, players_with_money, player_with_status, player_with_cards, table
+    ctx,
+    player,
+    players_with_money,
+    player_with_status,
+    player_with_cards,
+    table,
+    players_with_points,
 ):
     list_cards = []
     for card in table["cards_on_table"]:
@@ -233,6 +249,7 @@ async def game_over_check(
         list_cards.append(card)
 
     points = utils.score_calculate(list_cards)
+    players_with_points[player] = points
     await ctx.send(f"point of {player_with_cards} is {points}")
 
 
