@@ -55,6 +55,42 @@ async def check_player_count(ctx, nplayers):
     return True
 
 
+def score_calculate(list_of_cards):
+    player_points = 0
+
+    card_values = {
+        "A": 14,
+        "K": 13,
+        "Q": 12,
+        "J": 11,
+        "T": 10,
+        "9": 9,
+        "8": 8,
+        "7": 7,
+        "6": 6,
+        "5": 5,
+        "4": 4,
+        "3": 3,
+        "2": 2,
+    }
+
+    rank_counts = {}
+    for card in list_of_cards:
+        value = card.split()[0]
+        rank_counts[value] = rank_counts.get(value, 0) + 1
+
+    for value, count in rank_counts.items():
+        if count == 4:
+            player_points += 100  # Four of a kind
+        elif count == 3:
+            player_points += 50  # Three of a kind
+        elif count == 2:
+            player_points += 20  # One pair
+        player_points += card_values[value] * count
+
+    return player_points
+
+
 def debugger(func):
     def debugger_func(*args, **kwargs):
         print("starting debugger")

@@ -143,13 +143,11 @@ async def start_game_loop(
     current_player_index = 0
     game_over = False
     turn_number = 0
-    # continue here
     while not game_over:
         if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
             for index in random_two:
-                table["cards_on_table"].append(
-                    server_deck[ctx.guild.id][index])
+                table["cards_on_table"].append(server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
 
@@ -169,8 +167,7 @@ async def start_game_loop(
         await process_player_action(
             ctx, action, current_player, players_with_money, table, player_with_status
         )
-        all_players_ready = all(
-            player_with_status[player] for player in players)
+        all_players_ready = all(player_with_status[player] for player in players)
         if all_players_ready:
             for player in players:
                 await ctx.send("ending the game")
@@ -180,6 +177,7 @@ async def start_game_loop(
                     players_with_money,
                     player_with_status,
                     players_with_cards,
+                    table,
                 )
             break
             # add logic to check if all player_with_status[player] == True
@@ -226,15 +224,22 @@ async def get_player_action(ctx, current_player):
 
 
 async def game_over_check(
-    ctx, player, players_with_money, player_with_status, player_with_cards
+    ctx, player, players_with_money, player_with_status, player_with_cards, table
 ):
-    pass
+    list_cards = []
+    for card in table["cards_on_table"]:
+        list_cards.append(card)
+    for card in player_with_cards[player]:
+        list_cards.append(card)
+
+    points = utils.score_calculate(list_cards)
+    await ctx.send(f"point of {player_with_cards} is {points}")
 
 
 async def process_player_action(
     ctx, action, current_player, player_with_money, table, player_with_status
 ):
-    if player_with_status[current_player] == False:
+    if not player_with_status[current_player]:
         if isinstance(action, list):
             if action[0] == "call":
                 if player_with_money[current_player] >= int(action[1]):
@@ -299,70 +304,3 @@ async def stop_game(ctx):
 # logic to stop game
 
 bot.run(token_bot)
-
-# Code below is written by chatgpt, do not pay attention it is for reference during card permutation
-#
-# from collections import Counter
-#
-#
-# # Function to check for a straight
-# def has_straight(hand_values):
-#     return max(hand_values) - min(hand_values) == 4 and len(set(hand_values)) == 5
-#
-#
-# # Function to check for a flush
-# def has_flush(hand_suits):
-#     return len(set(hand_suits)) == 1
-#
-#
-# # Function to check the hand and determine the best possible hand
-# def check_hand(cards):
-#     values = {
-#         "2": 2,
-#         "3": 3,
-#         "4": 4,
-#         "5": 5,
-#         "6": 6,
-#         "7": 7,
-#         "8": 8,
-#         "9": 9,
-#         "T": 10,
-#         "J": 11,
-#         "Q": 12,
-#         "K": 13,
-#         "A": 14,
-#     }
-#     suits = [card[1] for card in cards]
-#     hand_values = [values[card[0]] for card in cards]
-#     hand_values.sort()
-#
-#     # Check for straight flush, straight, and flush
-#     if has_flush(suits) and has_straight(hand_values):
-#         return "Straight Flush"
-#     elif has_flush(suits):
-#         return "Flush"
-#     elif has_straight(hand_values):
-#         return "Straight"
-#
-#     # Check for four of a kind
-#     if 4 in Counter(hand_values).values():
-#         return "Four of a Kind"
-#
-#     # Check for full house
-#     if set(Counter(hand_values).values()) == {2, 3}:
-#         return "Full House"
-#
-#     # Check for three of a kind
-#     if 3 in Counter(hand_values).values():
-#         return "Three of a Kind"
-#
-#     # Check for two pairs
-#     if list(Counter(hand_values).values()).count(2) == 2:
-#         return "Two Pair"
-#
-#     # Check for one pair
-#     if 2 in Counter(hand_values).values():
-#         return "One Pair"
-#
-#     # Otherwise, the best hand is high card
-#     return "High Card"
