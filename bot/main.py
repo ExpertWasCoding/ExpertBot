@@ -7,7 +7,7 @@ import utils
 
 # note all bugs through test and run
 # give points to won player, refresh the won condition to the player with 0 money
-# on work again
+#commit check for new device
 # max players exceeded warning on "play"
 # index range error handle
 # add a stop command
