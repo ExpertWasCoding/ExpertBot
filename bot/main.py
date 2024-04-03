@@ -5,6 +5,7 @@ from discord.ext import commands
 import discord
 import utils
 
+# note all bugs through test and run
 # give points to won player, refresh the won condition to the player with 0 money
 # on work again
 # max players exceeded warning on "play"
