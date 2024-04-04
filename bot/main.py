@@ -5,6 +5,7 @@ from discord.ext import commands
 import discord
 import utils
 
+# tomorrow or day after tomorrow this shit will be put to end
 # note all bugs through test and run
 # give points to won player, refresh the won condition to the player with 0 money
 #commit check for new device
