@@ -175,7 +175,6 @@ async def start_game_loop(
             player_with_status[player] for player in players)
         if all_players_ready:
             for player in players:
-                await ctx.send("ending the game")
                 await game_over_check(
                     ctx,
                     player,
@@ -219,7 +218,7 @@ async def get_player_action(ctx, current_player):
             try:
                 await ctx.send(f"raised for {int(splitted_message[1])}")
                 return [splitted_message[0], splitted_message[1]]
-            except ValueError:
+    except ValueError:
                 await ctx.send(
                     f"{current_player.mention} is not a number, pls try again"
                 )
@@ -228,6 +227,7 @@ async def get_player_action(ctx, current_player):
     except asyncio.TimeoutError:
         await ctx.send(f"{current_player.mention} took too long to make a move.")
         return
+
 
 
 async def game_over_check(
