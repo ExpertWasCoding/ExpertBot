@@ -186,7 +186,8 @@ async def start_game_loop(
                     players_with_points,
                     players_money_on_table
                 )
-            await ctx.send(f"final result {players_with_points}")
+            won_player = max(players_with_points, key=players_with_points.get)
+            await ctx.send(f"{won_player} has won the game")
             break
 
         # Check if the game is over or move to the next player's turn
@@ -247,9 +248,7 @@ async def game_over_check(
 
     points = utils.score_calculate(list_cards)
     players_with_points[player] = points
-    await ctx.send(f"point of {player_with_cards} is {points}")
     won_player = max(players_with_points, key=players_with_points.get)
-    await ctx.send(f"{won_player} has won the game")
     players_with_money[won_player] += table["money"]
     table["money"] = 0
 
