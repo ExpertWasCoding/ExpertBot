@@ -117,13 +117,6 @@ async def start(ctx, nplayers=None):
             f"your cards are {players_with_cards[player]} and money is {players_with_money[player]}"
         )
 
-    for cards in players_with_cards.values():
-        for card in cards:
-            if card in server_deck[ctx.guild.id]:
-                server_deck[ctx.guild.id].remove(card)
-                table["cards"].append(card)
-            else:
-                await ctx.send(f"{card} not found")
     table["cards_on_table"] = []
     await start_game_loop(
         ctx,
@@ -175,7 +168,6 @@ async def start_game_loop(
 
         # Wait for the player's action (like fold, call, raise, etc.)
         action = await get_player_action(ctx, current_player)
-        await ctx.send(f"{action}")
         await process_player_action(
             ctx, action, current_player, players_with_money, table, player_with_status, players_money_on_table
         )
@@ -216,7 +208,6 @@ async def get_player_action(ctx, current_player):
             return "fold"
         elif splitted_message[0] == "call":
             try:
-                await ctx.send(f"called for {int(splitted_message[1])}")
                 return [splitted_message[0], splitted_message[1]]
             except ValueError:
                 await ctx.send(

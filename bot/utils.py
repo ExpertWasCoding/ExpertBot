@@ -55,15 +55,15 @@ async def check_player_count(ctx, nplayers):
         )
     return True
 
-
+#idk how this is working
 def score_calculate(list_of_cards):
     player_points = 0
 
     card_values = {
-        "A": 14,
-        "K": 13,
-        "Q": 12,
-        "J": 11,
+        "Ace": 14,
+        "King": 13,
+        "Queen": 12,
+        "Jack": 11,
         "T": 10,
         "9": 9,
         "8": 8,
