@@ -96,6 +96,7 @@ async def start(ctx, nplayers=None):
             break
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
+    players_money_on_table = {}
     players_with_money = {}
     players_with_points = {}
     player_with_status = {}
@@ -109,6 +110,7 @@ async def start(ctx, nplayers=None):
         player_with_status[player] = False
         players_with_cards[player] = cards
         players_with_points[player] = 0
+        players_money_on_table[player] = 0
         players_with_money[player] = 1000
     for player in players:
         await player_with_ids[player].send(
@@ -132,6 +134,7 @@ async def start(ctx, nplayers=None):
         table,
         player_with_status,
         players_with_points,
+        players_money_on_table
     )
     # await ctx.send(len(server_deck[ctx.guild.id]))
 
@@ -145,6 +148,7 @@ async def start_game_loop(
     table,
     player_with_status,
     players_with_points,
+    players_money_on_table
 ):
     current_player_index = 0
     game_over = False
@@ -173,7 +177,7 @@ async def start_game_loop(
         action = await get_player_action(ctx, current_player)
         await ctx.send(f"{action}")
         await process_player_action(
-            ctx, action, current_player, players_with_money, table, player_with_status
+            ctx, action, current_player, players_with_money, table, player_with_status, players_money_on_table
         )
         all_players_ready = all(
             player_with_status[player] for player in players)
@@ -188,10 +192,10 @@ async def start_game_loop(
                     players_with_cards,
                     table,
                     players_with_points,
+                    players_money_on_table
                 )
             await ctx.send(f"final result {players_with_points}")
             break
-        # make this correct
 
         # Check if the game is over or move to the next player's turn
         turn_number += 1
@@ -242,6 +246,7 @@ async def game_over_check(
     player_with_cards,
     table,
     players_with_points,
+    players_money_on_table
 ):
     list_cards = []
     for card in table["cards_on_table"]:
@@ -252,16 +257,22 @@ async def game_over_check(
     points = utils.score_calculate(list_cards)
     players_with_points[player] = points
     await ctx.send(f"point of {player_with_cards} is {points}")
+    won_player = max(players_with_points, key=players_with_points.get)
+    await ctx.send(f"{won_player} has won the game")
+    players_with_money[won_player] += table["money"]
+    table["money"] = 0
+
 
 
 async def process_player_action(
-    ctx, action, current_player, player_with_money, table, player_with_status
+    ctx, action, current_player, player_with_money, table, player_with_status, player_money_on_table
 ):
     if not player_with_status[current_player]:
         if isinstance(action, list):
             if action[0] == "call":
                 if player_with_money[current_player] >= int(action[1]):
                     player_with_money[current_player] -= int(action[1])
+                    player_money_on_table[current_player] += int(action[1])
                     table["money"] += int(action[1])
                     player_with_status[current_player] = True
                 else:
