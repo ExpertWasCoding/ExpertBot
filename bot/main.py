@@ -104,9 +104,9 @@ async def start(ctx, nplayers=None):
     for player in players:
         random_indices = utils.random_numbers(2)
         cards = []
-        for index in random_indices:
-            cards.append(server_deck[ctx.guild.id][index])
-            del server_deck[ctx.guild.id][index]
+        # for index in random_indices:
+        #     cards.append(server_deck[ctx.guild.id][index])
+        #     del server_deck[ctx.guild.id][index]
         player_with_status[player] = False
         players_with_cards[player] = cards
         players_with_points[player] = 0
