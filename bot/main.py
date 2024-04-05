@@ -218,15 +218,18 @@ async def get_player_action(ctx, current_player):
             try:
                 await ctx.send(f"raised for {int(splitted_message[1])}")
                 return [splitted_message[0], splitted_message[1]]
-    except ValueError:
-                await ctx.send(
-                    f"{current_player.mention} is not a number, pls try again"
-                )
+            except ValueError:
+                await ctx.send(f"not a number pls try again.")
                 await get_player_action(ctx, current_player)
-
     except asyncio.TimeoutError:
-        await ctx.send(f"{current_player.mention} took too long to make a move.")
-        return
+                await ctx.send(f"{current_player.mention} took too long to make a move.")
+                return
+    except:
+        await ctx.send(
+            f"{current_player.mention} is not a number, pls try again"
+        )
+        await get_player_action(ctx, current_player)
+
 
 
 
