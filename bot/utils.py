@@ -64,7 +64,7 @@ def score_calculate(list_of_cards):
         "King": 13,
         "Queen": 12,
         "Jack": 11,
-        "T": 10,
+        "10": 10,
         "9": 9,
         "8": 8,
         "7": 7,
