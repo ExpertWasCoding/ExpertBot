@@ -316,11 +316,9 @@ async def mentioned(ctx, arg):
 
 @bot.command()
 async def dm_user(ctx, user_mention: discord.Member, *, message: str):
-    # Check if the user has permissions to send DMs
     if not user_mention.dm_channel:
         await user_mention.create_dm()
 
-    # Send the message
     await user_mention.send(message)
     await ctx.send(f"Message sent to {user_mention.mention}")
 

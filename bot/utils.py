@@ -30,6 +30,7 @@ def random_numbers(n, _range=53):
     list_of_rand_nums = []
     for i in range(n):
         nums = rand.randint(0, _range)
+        _range -= 1
         list_of_rand_nums.append(nums)
     return list_of_rand_nums
 
