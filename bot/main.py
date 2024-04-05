@@ -104,9 +104,9 @@ async def start(ctx, nplayers=None):
     for player in players:
         random_indices = utils.random_numbers(2)
         cards = []
-        # for index in random_indices:
-        #     cards.append(server_deck[ctx.guild.id][index])
-        #     del server_deck[ctx.guild.id][index]
+        for index in random_indices:
+            cards.append(server_deck[ctx.guild.id][index])
+            del server_deck[ctx.guild.id][index]
         player_with_status[player] = False
         players_with_cards[player] = cards
         players_with_points[player] = 0
@@ -154,6 +154,23 @@ async def start_game_loop(
                     server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
+        elif turn_number == len(players)*2:
+            random_one = utils.random_numbers(1, 51 - (len(players)* 2))
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            del server_deck[ctx.guild.id][random_one]
+        elif turn_number == len(players)*3:
+            random_one = utils.random_numbers(1, 50 - (len(players)* 2))
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            del server_deck[ctx.guild.id][random_one]
+        elif turn_number == len(players)*4:
+            random_one = utils.random_numbers(1, 49 - (len(players)* 2))
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            del server_deck[ctx.guild.id][random_one]
+        elif turn_number == len(players)*5:
+            random_one = utils.random_numbers(1, 48 - (len(players)* 2))
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            del server_deck[ctx.guild.id][random_one]
+
 
         current_player = players[current_player_index]
 
@@ -173,7 +190,7 @@ async def start_game_loop(
         )
         all_players_ready = all(
             player_with_status[player] for player in players)
-        if all_players_ready:
+        if all_players_ready or turn_number == len(players)*5 :
             for player in players:
                 await game_over_check(
                     ctx,
@@ -216,7 +233,7 @@ async def get_player_action(ctx, current_player):
                 await get_player_action(ctx, current_player)
         elif splitted_message[0] == "raise":
             try:
-                await ctx.send(f"raised for {int(splitted_message[1])}")
+                await ctx.send(f"raised raised {int(splitted_message[1])}")
                 return [splitted_message[0], splitted_message[1]]
             except ValueError:
                 await ctx.send(f"not a number pls try again.")
