@@ -60,6 +60,8 @@ async def start(ctx, nplayers=None):
 
     players = []
     player_id = []
+    server_bar = {}
+    server_bar[ctx.guild.id] = 0
     player_with_ids = {}
     server_data[server_id]["IsRunning"] = True
 
@@ -120,6 +122,7 @@ async def start(ctx, nplayers=None):
         player_with_status,
         players_with_points,
         players_money_on_table,
+        server_bar,
     )
 
 
@@ -133,6 +136,7 @@ async def start_game_loop(
     player_with_status,
     players_with_points,
     players_money_on_table,
+    server_bar,
 ):
     current_player_index = 0
     global game_over
@@ -180,6 +184,7 @@ async def start_game_loop(
             table,
             player_with_status,
             players_money_on_table,
+            server_bar,
         )
         players_ready_to_end = []
         for player in players:
@@ -275,6 +280,7 @@ async def process_player_action(
     table,
     player_with_status,
     player_money_on_table,
+    server_bar,
 ):
     if not player_with_status[current_player]:
         if isinstance(action, list):
@@ -287,7 +293,11 @@ async def process_player_action(
                 else:
                     await ctx.send("Not enough money")
             elif action[0] == "raise":
-                if player_with_money[current_player] >= int(action[1]):
+                if (
+                    player_with_money[current_player] >= int(action[1])
+                    and int(action[1]) > server_bar[ctx.guild.id]
+                ):
+                    player_with_status[current_player] = True
                     player_with_money[current_player] -= int(action[1])
                     table["money"] += int(action[1])
                 else:
