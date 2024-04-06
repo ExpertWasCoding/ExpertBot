@@ -6,14 +6,6 @@ import utils
 from dotenv import load_dotenv
 import os
 
-# tomorrow or day after tomorrow this shit will be put to end
-# note all bugs through test and run
-# give points to won player, refresh the won condition to the player with 0 money
-# commit check for new device
-# max players exceeded warning on "play"
-# index range error handle
-# add a stop command
-# should have used hash tables fuck
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix=">", intents=intents)
@@ -129,7 +121,6 @@ async def start(ctx, nplayers=None):
         players_with_points,
         players_money_on_table,
     )
-    # await ctx.send(len(server_deck[ctx.guild.id]))
 
 
 async def start_game_loop(
@@ -151,43 +142,35 @@ async def start_game_loop(
         if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
             for index in random_two:
-                table["cards_on_table"].append(
-                    server_deck[ctx.guild.id][index])
+                table["cards_on_table"].append(server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
         elif turn_number == len(players) * 2:
             random_one = utils.random_numbers(1, 51 - (len(players) * 2))
-            table["cards_on_table"].append(
-                server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 3:
             random_one = utils.random_numbers(1, 50 - (len(players) * 2))
-            table["cards_on_table"].append(
-                server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 4:
             random_one = utils.random_numbers(1, 49 - (len(players) * 2))
-            table["cards_on_table"].append(
-                server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 5:
             random_one = utils.random_numbers(1, 48 - (len(players) * 2))
-            table["cards_on_table"].append(
-                server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
 
         current_player = players[current_player_index]
 
-        # Notify the current player that it's their turn
         await ctx.send(f"{player_with_ids[current_player]} It's your turn.")
 
-        # Show the player their cards and current money
         await player_with_ids[current_player].send(
             f"Your cards are {players_with_cards[current_player]} "
             f"and your money is {players_with_money[current_player]}"
         )
 
-        # Wait for the player's action (like fold, call, raise, etc.)
         action = await get_player_action(ctx, current_player)
         await process_player_action(
             ctx,
@@ -366,10 +349,6 @@ async def stop_game(ctx):
     await ctx.send("Game stopped.")
 
 
-# logic to stop game
 load_dotenv()
 token_bot = os.getenv("token_bot")
-bot.run(token_bot)
-
-bot.run(token_bot)
 bot.run(token_bot)
