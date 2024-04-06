@@ -1,14 +1,15 @@
 import pymongo
 import asyncio
-from bot_token import token_bot
 from discord.ext import commands
 import discord
 import utils
+from dotenv import load_dotenv
+import os
 
 # tomorrow or day after tomorrow this shit will be put to end
 # note all bugs through test and run
 # give points to won player, refresh the won condition to the player with 0 money
-#commit check for new device
+# commit check for new device
 # max players exceeded warning on "play"
 # index range error handle
 # add a stop command
@@ -128,7 +129,7 @@ async def start(ctx, nplayers=None):
         table,
         player_with_status,
         players_with_points,
-        players_money_on_table
+        players_money_on_table,
     )
     # await ctx.send(len(server_deck[ctx.guild.id]))
 
@@ -142,7 +143,7 @@ async def start_game_loop(
     table,
     player_with_status,
     players_with_points,
-    players_money_on_table
+    players_money_on_table,
 ):
     current_player_index = 0
     game_over = False
@@ -151,27 +152,25 @@ async def start_game_loop(
         if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
             for index in random_two:
-                table["cards_on_table"].append(
-                    server_deck[ctx.guild.id][index])
+                table["cards_on_table"].append(server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
-        elif turn_number == len(players)*2:
-            random_one = utils.random_numbers(1, 51 - (len(players)* 2))
+        elif turn_number == len(players) * 2:
+            random_one = utils.random_numbers(1, 51 - (len(players) * 2))
             table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
-        elif turn_number == len(players)*3:
-            random_one = utils.random_numbers(1, 50 - (len(players)* 2))
+        elif turn_number == len(players) * 3:
+            random_one = utils.random_numbers(1, 50 - (len(players) * 2))
             table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
-        elif turn_number == len(players)*4:
-            random_one = utils.random_numbers(1, 49 - (len(players)* 2))
+        elif turn_number == len(players) * 4:
+            random_one = utils.random_numbers(1, 49 - (len(players) * 2))
             table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
-        elif turn_number == len(players)*5:
-            random_one = utils.random_numbers(1, 48 - (len(players)* 2))
+        elif turn_number == len(players) * 5:
+            random_one = utils.random_numbers(1, 48 - (len(players) * 2))
             table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
-
 
         current_player = players[current_player_index]
 
@@ -187,11 +186,16 @@ async def start_game_loop(
         # Wait for the player's action (like fold, call, raise, etc.)
         action = await get_player_action(ctx, current_player)
         await process_player_action(
-            ctx, action, current_player, players_with_money, table, player_with_status, players_money_on_table
+            ctx,
+            action,
+            current_player,
+            players_with_money,
+            table,
+            player_with_status,
+            players_money_on_table,
         )
-        all_players_ready = all(
-            player_with_status[player] for player in players)
-        if all_players_ready or turn_number == len(players)*5 :
+        all_players_ready = all(player_with_status[player] for player in players)
+        if all_players_ready or turn_number == len(players) * 5:
             for player in players:
                 await game_over_check(
                     ctx,
@@ -201,7 +205,7 @@ async def start_game_loop(
                     players_with_cards,
                     table,
                     players_with_points,
-                    players_money_on_table
+                    players_money_on_table,
                 )
             won_player = max(players_with_points, key=players_with_points.get)
             await ctx.send(f"{won_player} has won the game")
@@ -240,15 +244,11 @@ async def get_player_action(ctx, current_player):
                 await ctx.send(f"not a number pls try again.")
                 await get_player_action(ctx, current_player)
     except asyncio.TimeoutError:
-                await ctx.send(f"{current_player.mention} took too long to make a move.")
-                return
+        await ctx.send(f"{current_player.mention} took too long to make a move.")
+        return
     except:
-        await ctx.send(
-            f"{current_player.mention} is not a number, pls try again"
-        )
+        await ctx.send(f"{current_player.mention} is not a number, pls try again")
         await get_player_action(ctx, current_player)
-
-
 
 
 async def game_over_check(
@@ -259,7 +259,7 @@ async def game_over_check(
     player_with_cards,
     table,
     players_with_points,
-    players_money_on_table
+    players_money_on_table,
 ):
     list_cards = []
     for card in table["cards_on_table"]:
@@ -274,9 +274,14 @@ async def game_over_check(
     table["money"] = 0
 
 
-
 async def process_player_action(
-    ctx, action, current_player, player_with_money, table, player_with_status, player_money_on_table
+    ctx,
+    action,
+    current_player,
+    player_with_money,
+    table,
+    player_with_status,
+    player_money_on_table,
 ):
     if not player_with_status[current_player]:
         if isinstance(action, list):
@@ -340,5 +345,6 @@ async def stop_game(ctx):
 
 
 # logic to stop game
-
+load_dotenv()
+token_bot = os.getenv("token_bot")
 bot.run(token_bot)
