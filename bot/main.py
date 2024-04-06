@@ -83,10 +83,7 @@ async def start(ctx, nplayers=None):
                 players.append(message.author.mention)
                 player_id.append(message.author)
                 player_with_ids[message.author.mention] = message.author
-                await ctx.send(
-                    f"{message.author} has joined the game,"
-                    f" total players are {players}"
-                )
+                await ctx.send(f"{message.author} has joined the game")
                 try:
                     await message.author.send("you are playing")
                 except discord.errors.Forbidden:
@@ -96,6 +93,7 @@ async def start(ctx, nplayers=None):
             await ctx.send("timed out")
             server_data[server_id]["IsRunning"] = True
             break
+    await ctx.send(f"players playing are {players}")
     server_deck[ctx.guild.id] = utils.create_deck()
     players_with_cards = {}
     players_money_on_table = {}
@@ -153,24 +151,29 @@ async def start_game_loop(
         if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
             for index in random_two:
-                table["cards_on_table"].append(server_deck[ctx.guild.id][index])
+                table["cards_on_table"].append(
+                    server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
         elif turn_number == len(players) * 2:
             random_one = utils.random_numbers(1, 51 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 3:
             random_one = utils.random_numbers(1, 50 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 4:
             random_one = utils.random_numbers(1, 49 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 5:
             random_one = utils.random_numbers(1, 48 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
 
         current_player = players[current_player_index]
@@ -251,12 +254,11 @@ async def get_player_action(ctx, current_player):
             except ValueError:
                 await ctx.send("not a number pls try again.")
                 await get_player_action(ctx, current_player)
+        else:
+            await get_player_action(ctx, current_player)
     except asyncio.TimeoutError:
         await ctx.send(f"{current_player.mention} took too long to make a move.")
         return
-    except:
-        await ctx.send(f"{current_player.mention} that is not a number, pls try again")
-        await get_player_action(ctx, current_player)
 
 
 async def game_over_check(
