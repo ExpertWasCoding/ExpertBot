@@ -146,6 +146,7 @@ async def start_game_loop(
     players_money_on_table,
 ):
     current_player_index = 0
+    global game_over
     game_over = False
     turn_number = 0
     while not game_over:
@@ -349,17 +350,16 @@ async def dm_user(ctx, user_mention: discord.Member, *, message: str):
 
 @bot.command()
 async def stop_game(ctx):
+    global game_over
     server_id = ctx.guild.id
     IsRunning = server_data.get(server_id, {}).get("IsRunning", False)
-    
+
     if not IsRunning:
         await ctx.send("No game is currently running.")
         return
-
-    # Stop the game and reset relevant variables
+    game_over = True
     server_data[server_id]["IsRunning"] = False
-    server_deck[ctx.guild.id] = []  # Reset the deck
-    # Reset other game-related variables as needed
+    server_deck[ctx.guild.id] = []
 
     await ctx.send("Game stopped.")
 
