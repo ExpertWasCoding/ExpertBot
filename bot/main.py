@@ -194,9 +194,18 @@ async def start_game_loop(
             player_with_status,
             players_money_on_table,
         )
-        all_players_ready = all(player_with_status[player] for player in players)
-        if all_players_ready or turn_number == len(players) * 5:
-            for player in players:
+        players_ready_to_end = []
+        for player in players:
+            if player_with_status[player] == "folded":
+                continue
+            else:
+                players_ready_to_end.append(player)
+
+        all_players_ready = all(
+            player_with_status[player] for player in players_ready_to_end
+        )
+        if all_players_ready or turn_number == len(players) * 5 or "":
+            for player in players_ready_to_end:
                 await game_over_check(
                     ctx,
                     player,
@@ -211,10 +220,8 @@ async def start_game_loop(
             await ctx.send(f"{won_player} has won the game")
             break
 
-        # Check if the game is over or move to the next player's turn
         turn_number += 1
         current_player_index = (current_player_index + 1) % len(players)
-        # game_over = check_game_over_condition()
 
 
 async def get_player_action(ctx, current_player):
@@ -241,13 +248,13 @@ async def get_player_action(ctx, current_player):
                 await ctx.send(f"raised raised {int(splitted_message[1])}")
                 return [splitted_message[0], splitted_message[1]]
             except ValueError:
-                await ctx.send(f"not a number pls try again.")
+                await ctx.send("not a number pls try again.")
                 await get_player_action(ctx, current_player)
     except asyncio.TimeoutError:
         await ctx.send(f"{current_player.mention} took too long to make a move.")
         return
     except:
-        await ctx.send(f"{current_player.mention} is not a number, pls try again")
+        await ctx.send(f"{current_player.mention} that is not a number, pls try again")
         await get_player_action(ctx, current_player)
 
 
@@ -303,6 +310,7 @@ async def process_player_action(
         await ctx.send(f"{current_player} is folded")
     elif isinstance(action, str):
         if action == "fold":
+            player_with_status[current_player] = "folded"
             await ctx.send("player folded successfully")
     else:
         await ctx.send("Some random error occured")
@@ -341,7 +349,19 @@ async def dm_user(ctx, user_mention: discord.Member, *, message: str):
 
 @bot.command()
 async def stop_game(ctx):
-    pass
+    server_id = ctx.guild.id
+    IsRunning = server_data.get(server_id, {}).get("IsRunning", False)
+    
+    if not IsRunning:
+        await ctx.send("No game is currently running.")
+        return
+
+    # Stop the game and reset relevant variables
+    server_data[server_id]["IsRunning"] = False
+    server_deck[ctx.guild.id] = []  # Reset the deck
+    # Reset other game-related variables as needed
+
+    await ctx.send("Game stopped.")
 
 
 # logic to stop game
