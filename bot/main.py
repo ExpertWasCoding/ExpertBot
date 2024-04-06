@@ -146,24 +146,29 @@ async def start_game_loop(
         if turn_number == len(players):
             random_two = utils.random_numbers(2, 53 - (len(players) * 2))
             for index in random_two:
-                table["cards_on_table"].append(server_deck[ctx.guild.id][index])
+                table["cards_on_table"].append(
+                    server_deck[ctx.guild.id][index])
                 del server_deck[ctx.guild.id][index]
             await ctx.send(f"{table['cards_on_table']} are now on table")
         elif turn_number == len(players) * 2:
             random_one = utils.random_numbers(1, 51 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 3:
             random_one = utils.random_numbers(1, 50 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 4:
             random_one = utils.random_numbers(1, 49 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
         elif turn_number == len(players) * 5:
             random_one = utils.random_numbers(1, 48 - (len(players) * 2))
-            table["cards_on_table"].append(server_deck[ctx.guild.id][random_one])
+            table["cards_on_table"].append(
+                server_deck[ctx.guild.id][random_one])
             del server_deck[ctx.guild.id][random_one]
 
         current_player = players[current_player_index]
@@ -196,7 +201,7 @@ async def start_game_loop(
         all_players_ready = all(
             player_with_status[player] for player in players_ready_to_end
         )
-        if all_players_ready or turn_number == len(players) * 5 or "":
+        if all_players_ready or turn_number == len(players) * 5:
             for player in players_ready_to_end:
                 await game_over_check(
                     ctx,
