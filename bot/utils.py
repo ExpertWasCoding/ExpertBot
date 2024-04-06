@@ -55,7 +55,6 @@ async def check_player_count(ctx, nplayers):
         )
     return True
 
-#idk how this is working
 def score_calculate(list_of_cards):
     player_points = 0
 
@@ -82,11 +81,11 @@ def score_calculate(list_of_cards):
 
     for value, count in rank_counts.items():
         if count == 4:
-            player_points += 100  # Four of a kind
+            player_points += 100  
         elif count == 3:
-            player_points += 50  # Three of a kind
+            player_points += 50  
         elif count == 2:
-            player_points += 20  # One pair
+            player_points += 20  
         player_points += card_values[value] * count
 
     return player_points
