@@ -4,3 +4,4 @@ server_data.json
 ~/projects/pokerbot/bot/bot_token.py
 .env
 bot/.env
+bin/dotenv
